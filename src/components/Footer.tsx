@@ -138,15 +138,15 @@ export const Footer: React.FC<FooterProps> = ({ businessInfo, onOpenSettings }) 
             <span>Pemesanan Praktis via WhatsApp</span>
             <span aria-hidden="true" className="opacity-40">·</span>
             
-            {/* Satu-satunya portal admin di bagian paling bawah & tersembunyi (low opacity) */}
+            {/* Akses Pengelola Kedai (Discreet Stealth Icon untuk Pemilik Sah) */}
             <button
               onClick={onOpenSettings}
-              className="opacity-30 hover:opacity-100 transition-opacity flex items-center gap-1.5 text-[#6B7480] hover:text-[#D49B58] p-1 cursor-pointer select-none"
-              title="Portal Admin Pengelola Kedai"
-              aria-label="Portal Admin"
+              className="opacity-20 hover:opacity-80 transition-opacity p-1 text-[#6B7480] hover:text-[#D49B58] cursor-pointer"
+              title="Akses Pengelola Kedai"
+              aria-label="Akses Pengelola"
             >
               <svg
-                className="w-3 h-3"
+                className="w-3.5 h-3.5"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -157,7 +157,6 @@ export const Footer: React.FC<FooterProps> = ({ businessInfo, onOpenSettings }) 
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
-              <span className="text-[10px] tracking-wide">Portal Admin</span>
             </button>
           </div>
         </div>

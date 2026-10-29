@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, RotateCcw, Plus, Trash2, Check, SlidersHorizontal, Coffee, Store, ShieldAlert, Sparkles, KeyRound, Lock, ShieldCheck, AlertTriangle, CreditCard } from 'lucide-react';
+import { X, Save, RotateCcw, Plus, Trash2, Check, SlidersHorizontal, Coffee, Store, ShieldAlert, Sparkles, KeyRound, Lock, ShieldCheck, AlertTriangle, CreditCard, Eye, EyeOff } from 'lucide-react';
 import { BusinessInfo, MenuItem, MenuCategory } from '../types';
 import { formatRupiah } from '../utils/formatters';
 
@@ -27,7 +27,6 @@ const CATEGORIES: MenuCategory[] = [
 const PIN_STORAGE_KEY = 'kopi_sukajadi_admin_pin_hash_v2';
 const MASTER_KEY_STORAGE = 'kopi_sukajadi_master_recovery_key';
 const DEFAULT_MASTER_KEY = 'SUKAJADI2026';
-const DEFAULT_PIN = '1234';
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_SECONDS = 60;
 
@@ -57,6 +56,22 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
   const [formData, setFormData] = useState<BusinessInfo>({ ...businessInfo });
   const [saveSuccessNotice, setSaveSuccessNotice] = useState(false);
 
+  // Device configuration status (has this device been activated with a private PIN?)
+  const [isDeviceConfigured, setIsDeviceConfigured] = useState<boolean>(() => {
+    try {
+      return Boolean(localStorage.getItem(PIN_STORAGE_KEY));
+    } catch {
+      return false;
+    }
+  });
+
+  // First-Time Device Activation State (Prevents unauthorized stranger access on any new device)
+  const [activationMasterKey, setActivationMasterKey] = useState('');
+  const [activationPhone, setActivationPhone] = useState('');
+  const [activationNewPin, setActivationNewPin] = useState('');
+  const [activationConfirmPin, setActivationConfirmPin] = useState('');
+  const [activationError, setActivationError] = useState('');
+
   // Hidden admin PIN security & rate-limiting
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pinInput, setPinInput] = useState('');
@@ -80,6 +95,7 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
       return DEFAULT_MASTER_KEY;
     }
   });
+  const [showMasterKeySecret, setShowMasterKeySecret] = useState(false);
   const [customMasterKeyInput, setCustomMasterKeyInput] = useState('');
   const [masterKeyMessage, setMasterKeyMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -106,6 +122,7 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
         if (prev <= 1) {
           setPinError('');
           setRecoveryError('');
+          setActivationError('');
           return 0;
         }
         return prev - 1;
@@ -142,7 +159,84 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
     setRecoveryError('');
     setRecoveryNotice('');
     setMasterKeyMessage(null);
+    setActivationMasterKey('');
+    setActivationPhone('');
+    setActivationNewPin('');
+    setActivationConfirmPin('');
+    setActivationError('');
     onClose();
+  };
+
+  // First-Time Activation for New Devices
+  const handleActivateDevice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setActivationError('');
+
+    if (lockoutTimer > 0) {
+      setActivationError(`Sistem dibekukan sementara. Tunggu ${lockoutTimer} detik.`);
+      return;
+    }
+
+    const storedMasterKey = localStorage.getItem(MASTER_KEY_STORAGE) || DEFAULT_MASTER_KEY;
+    const enteredMasterKey = activationMasterKey.trim();
+
+    const storePhoneClean = businessInfo.whatsappNumber.replace(/\D/g, '');
+    const enteredPhoneClean = activationPhone.replace(/\D/g, '');
+
+    if (!enteredMasterKey || !enteredPhoneClean || !activationNewPin.trim() || !activationConfirmPin.trim()) {
+      setActivationError('Semua kolom verifikasi dan PIN wajib diisi.');
+      return;
+    }
+
+    if (enteredMasterKey !== storedMasterKey) {
+      const newAttempts = failedAttempts + 1;
+      setFailedAttempts(newAttempts);
+      if (newAttempts >= MAX_FAILED_ATTEMPTS) {
+        setLockoutTimer(LOCKOUT_SECONDS);
+        setActivationError(`Kunci Rahasia Pemilik Salah (${newAttempts}x)! Sistem dibekukan selama ${LOCKOUT_SECONDS} detik untuk proteksi.`);
+      } else {
+        setActivationError(`Kunci Rahasia Pemilik Salah! Sisa percobaan: ${MAX_FAILED_ATTEMPTS - newAttempts} kali.`);
+      }
+      return;
+    }
+
+    const phoneMatches =
+      enteredPhoneClean === storePhoneClean ||
+      (storePhoneClean.startsWith('62') && enteredPhoneClean === '0' + storePhoneClean.slice(2)) ||
+      (enteredPhoneClean.startsWith('62') && storePhoneClean === '0' + enteredPhoneClean.slice(2)) ||
+      (storePhoneClean.endsWith(enteredPhoneClean.slice(-8)));
+
+    if (!phoneMatches) {
+      setActivationError(`Nomor WhatsApp tidak cocok dengan nomor resmi terdaftar (${businessInfo.whatsappNumber}). Akses ditolak.`);
+      return;
+    }
+
+    if (activationNewPin.trim().length < 4) {
+      setActivationError('PIN baru minimal harus 4 digit angka.');
+      return;
+    }
+
+    if (activationNewPin.trim() !== activationConfirmPin.trim()) {
+      setActivationError('Konfirmasi PIN baru tidak sesuai.');
+      return;
+    }
+
+    const newHash = await computePinHash(activationNewPin.trim());
+    try {
+      localStorage.setItem(PIN_STORAGE_KEY, newHash);
+    } catch (err) {
+      console.warn('Failed to store new PIN', err);
+    }
+
+    setIsDeviceConfigured(true);
+    setIsAuthenticated(true);
+    setFailedAttempts(0);
+    setLockoutTimer(0);
+    setActivationMasterKey('');
+    setActivationPhone('');
+    setActivationNewPin('');
+    setActivationConfirmPin('');
+    setActivationError('');
   };
 
   // Verified Owner PIN Recovery (Requires Secret Master Key & Registered WhatsApp Phone)
@@ -179,7 +273,13 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
       return;
     }
 
-    if (enteredPhoneClean !== storePhoneClean) {
+    const phoneMatches =
+      enteredPhoneClean === storePhoneClean ||
+      (storePhoneClean.startsWith('62') && enteredPhoneClean === '0' + storePhoneClean.slice(2)) ||
+      (enteredPhoneClean.startsWith('62') && storePhoneClean === '0' + enteredPhoneClean.slice(2)) ||
+      (storePhoneClean.endsWith(enteredPhoneClean.slice(-8)));
+
+    if (!phoneMatches) {
       setRecoveryError(`Nomor WhatsApp tidak cocok dengan nomor terdaftar kedai ini (${businessInfo.whatsappNumber}). Akses ditolak.`);
       return;
     }
@@ -197,6 +297,7 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
       console.warn('Failed to store new PIN', err);
     }
 
+    setIsDeviceConfigured(true);
     setLockoutTimer(0);
     setFailedAttempts(0);
     setRecoverySecretKey('');
@@ -240,20 +341,16 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
       return;
     }
 
-    // Verify against custom hashed PIN or default
+    // Verify against custom hashed PIN
     const storedHash = localStorage.getItem(PIN_STORAGE_KEY);
-    const inputHash = await computePinHash(pinInput);
-
-    let isValid = false;
-    if (storedHash) {
-      isValid = inputHash === storedHash;
-    } else {
-      // If owner hasn't set custom PIN yet, default PIN is 1234
-      const defaultHash = await computePinHash(DEFAULT_PIN);
-      isValid = inputHash === defaultHash;
+    if (!storedHash) {
+      setIsDeviceConfigured(false);
+      setPinError('Perangkat ini belum diaktivasi oleh pengelola.');
+      return;
     }
 
-    if (isValid) {
+    const inputHash = await computePinHash(pinInput);
+    if (inputHash === storedHash) {
       setIsAuthenticated(true);
       setPinError('');
       setFailedAttempts(0);
@@ -293,18 +390,14 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
 
     // Verify current PIN first
     const storedHash = localStorage.getItem(PIN_STORAGE_KEY);
-    const currentHash = await computePinHash(currentPinInput);
-
-    let isCurrentValid = false;
-    if (storedHash) {
-      isCurrentValid = currentHash === storedHash;
-    } else {
-      const defaultHash = await computePinHash(DEFAULT_PIN);
-      isCurrentValid = currentHash === defaultHash;
+    if (!storedHash) {
+      setPinChangeMessage({ type: 'error', text: 'PIN belum dikonfigurasi pada perangkat ini.' });
+      return;
     }
 
-    if (!isCurrentValid) {
-      setPinChangeMessage({ type: 'error', text: 'PIN Lama salah. Verifikasi identitas gagal.' });
+    const currentHash = await computePinHash(currentPinInput);
+    if (currentHash !== storedHash) {
+      setPinChangeMessage({ type: 'error', text: 'PIN Saat Ini salah. Verifikasi identitas gagal.' });
       return;
     }
 
@@ -385,10 +478,12 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
 
           <div>
             <h3 className="font-serif font-bold text-lg text-[#F0F2F5]">
-              Portal Admin Tersembunyi
+              {!isDeviceConfigured ? 'Aktivasi Perangkat Pengelola' : 'Portal Pengelola Kedai'}
             </h3>
             <p className="text-xs text-[#8C95A3] mt-1">
-              Khusus pengelola Kedai Sukajadi untuk mengatur menu, nomor WhatsApp, dan sistem kedai.
+              {!isDeviceConfigured
+                ? 'Perangkat ini belum diaktivasi. Masukkan Kunci Rahasia Pemilik & WhatsApp kedai untuk membuat PIN akses.'
+                : 'Khusus pengelola Kedai Sukajadi untuk mengatur menu, nomor WhatsApp, dan sistem kedai.'}
             </p>
             <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#16191D] border border-[#262B33] text-[11px] text-[#A3E0C1]">
               <ShieldCheck className="w-3.5 h-3.5 text-[#A3E0C1]" />
@@ -404,8 +499,123 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
             </div>
           )}
 
-          {/* SECURE FORGOT PIN RECOVERY: Requires Secret Master Key & Registered Store WhatsApp */}
-          {showForgotPin ? (
+          {/* STATE 1: UNCONFIGURED DEVICE (First-time device activation, prevents random strangers from entering) */}
+          {!isDeviceConfigured ? (
+            <div className="space-y-3 pt-1 text-left bg-[#16191D] p-4 rounded-xl border border-[#262B33]">
+              <div className="flex items-center justify-between pb-1 border-b border-[#262B33]">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-[#D49B58]">
+                  <KeyRound className="w-4 h-4 text-[#D49B58]" />
+                  <span>Aktivasi Perangkat Pemilik</span>
+                </div>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-800">
+                  Perangkat Baru
+                </span>
+              </div>
+
+              <p className="text-[11px] text-[#9DA7B3] leading-relaxed">
+                Untuk mencegah orang lain merusak data kedai, perangkat baru wajib diverifikasi dengan <strong>Kunci Rahasia Pemilik</strong> dan <strong>Nomor WhatsApp Resmi</strong> kedai.
+              </p>
+
+              {activationError && (
+                <div className="p-2.5 bg-red-950/90 border border-red-800 rounded-xl text-[11px] text-red-200 flex items-start gap-1.5">
+                  <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                  <span>{activationError}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleActivateDevice} className="space-y-2.5">
+                <div>
+                  <label className="block text-[11px] font-semibold text-[#F0F2F5] mb-1">
+                    Kunci Rahasia Pemilik <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Masukkan Kunci Rahasia Pemilik"
+                    value={activationMasterKey}
+                    onChange={(e) => {
+                      setActivationMasterKey(e.target.value);
+                      if (activationError) setActivationError('');
+                    }}
+                    className="w-full px-3 py-2 bg-[#1A1D22] text-[#F0F2F5] rounded-xl text-xs border border-[#2C323B] focus:ring-1 focus:ring-[#D49B58] focus:outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-[#F0F2F5] mb-1">
+                    Nomor WhatsApp Kedai Resmi <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: 085324345678"
+                    value={activationPhone}
+                    onChange={(e) => {
+                      setActivationPhone(e.target.value);
+                      if (activationError) setActivationError('');
+                    }}
+                    className="w-full px-3 py-2 bg-[#1A1D22] text-[#F0F2F5] rounded-xl text-xs font-mono border border-[#2C323B] focus:ring-1 focus:ring-[#D49B58] focus:outline-hidden"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[#F0F2F5] mb-1">
+                      Buat PIN Baru <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      maxLength={12}
+                      required
+                      placeholder="Min. 4 Digit"
+                      value={activationNewPin}
+                      onChange={(e) => {
+                        setActivationNewPin(e.target.value);
+                        if (activationError) setActivationError('');
+                      }}
+                      className="w-full px-3 py-2 bg-[#1A1D22] text-[#F0F2F5] rounded-xl text-xs font-mono border border-[#2C323B] focus:ring-1 focus:ring-[#D49B58] focus:outline-hidden"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[#F0F2F5] mb-1">
+                      Konfirmasi PIN <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      maxLength={12}
+                      required
+                      placeholder="Ulangi PIN"
+                      value={activationConfirmPin}
+                      onChange={(e) => {
+                        setActivationConfirmPin(e.target.value);
+                        if (activationError) setActivationError('');
+                      }}
+                      className="w-full px-3 py-2 bg-[#1A1D22] text-[#F0F2F5] rounded-xl text-xs font-mono border border-[#2C323B] focus:ring-1 focus:ring-[#D49B58] focus:outline-hidden"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2 flex flex-col gap-2">
+                  <button
+                    type="submit"
+                    className="w-full py-2.5 bg-[#D49B58] hover:bg-[#E5B074] text-[#0F1113] text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
+                  >
+                    Verifikasi Pemilik & Aktifkan Akses
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSecureClose}
+                    className="w-full py-2 text-xs font-medium text-red-300 hover:text-white rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-900/60 transition-colors cursor-pointer text-center"
+                  >
+                    ✕ Tutup ke Beranda
+                  </button>
+                </div>
+              </form>
+            </div>
+          ) : showForgotPin ? (
+            /* STATE 2: VERIFIED OWNER PIN RECOVERY */
             <div className="space-y-3 pt-1 text-left bg-[#16191D] p-4 rounded-xl border border-[#262B33]">
               <div className="flex items-center justify-between pb-1 border-b border-[#262B33]">
                 <div className="flex items-center gap-1.5 text-xs font-semibold text-[#D49B58]">
@@ -436,7 +646,7 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
                   <input
                     type="password"
                     required
-                    placeholder="Kunci Rahasia (Bawaan: SUKAJADI2026)"
+                    placeholder="Masukkan Kunci Rahasia Pemilik"
                     value={recoverySecretKey}
                     onChange={(e) => {
                       setRecoverySecretKey(e.target.value);
@@ -444,9 +654,6 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
                     }}
                     className="w-full px-3 py-2 bg-[#1A1D22] text-[#F0F2F5] rounded-xl text-xs border border-[#2C323B] focus:ring-1 focus:ring-[#D49B58] focus:outline-hidden"
                   />
-                  <span className="text-[10px] text-[#8C95A3] mt-0.5 block">
-                    Kunci master awal: <span className="font-mono text-[#D49B58]">SUKAJADI2026</span>
-                  </span>
                 </div>
 
                 <div>
@@ -456,7 +663,7 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
                   <input
                     type="text"
                     required
-                    placeholder={`Nomor WA Kedai (${formData.whatsappNumber})`}
+                    placeholder="Nomor WA Kedai Resmi (Contoh: 085324345678)"
                     value={recoveryPhone}
                     onChange={(e) => {
                       setRecoveryPhone(e.target.value);
@@ -515,6 +722,7 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
               </form>
             </div>
           ) : (
+            /* STATE 3: STANDARD DISCREET PIN LOGIN */
             <form onSubmit={handleVerifyPin} className="space-y-3 pt-1">
               {lockoutTimer > 0 ? (
                 <div className="p-3 bg-red-950/80 border border-red-800 rounded-xl text-xs text-red-200 space-y-2">
@@ -550,7 +758,7 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
                   maxLength={12}
                   disabled={lockoutTimer > 0}
                   autoFocus
-                  placeholder={lockoutTimer > 0 ? 'Terkunci...' : 'Masukkan PIN Admin (Bawaan: 1234)'}
+                  placeholder={lockoutTimer > 0 ? 'Terkunci...' : 'Masukkan PIN Keamanan Admin'}
                   value={pinInput}
                   onChange={(e) => {
                     setPinInput(e.target.value);
@@ -1289,7 +1497,7 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
                     <span>Ganti PIN Rahasia Admin Kedai</span>
                   </h3>
                   <p className="text-xs text-[#8C95A3] mt-0.5">
-                    Ganti PIN default pabrik (1234) menjadi PIN rahasia Anda agar tidak ada orang lain yang bisa masuk.
+                    Ganti PIN keamanan akses Anda secara berkala agar pengelola lain atau pihak luar tidak dapat mengakses sistem.
                   </p>
                 </div>
 
@@ -1321,7 +1529,7 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
                         type="password"
                         required
                         maxLength={12}
-                        placeholder="Default: 1234"
+                        placeholder="Masukkan PIN saat ini"
                         value={currentPinInput}
                         onChange={(e) => setCurrentPinInput(e.target.value)}
                         className="w-full px-3 py-2 bg-[#1A1D22] text-[#F0F2F5] rounded-xl text-xs font-mono border border-[#2C323B] focus:ring-2 focus:ring-[#D49B58] focus:outline-hidden"
@@ -1389,14 +1597,24 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
                   </p>
                 </div>
 
-                <div className="p-3 bg-[#1A1D22] rounded-xl border border-[#2C323B] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                  <div>
-                    <span className="text-[#8C95A3] text-[11px] block">Kunci Rahasia Saat Ini:</span>
-                    <span className="font-mono font-bold text-sm text-[#D49B58] tracking-wider">
-                      {currentMasterKey}
-                    </span>
+                <div className="p-3 bg-[#1A1D22] rounded-xl border border-[#2C323B] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <div>
+                      <span className="text-[#8C95A3] text-[11px] block">Kunci Rahasia Saat Ini:</span>
+                      <span className="font-mono font-bold text-sm text-[#D49B58] tracking-wider">
+                        {showMasterKeySecret ? currentMasterKey : '••••••••••••'}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowMasterKeySecret(!showMasterKeySecret)}
+                      className="p-1.5 rounded-lg bg-[#252A33] hover:bg-[#2F3642] text-[#8C95A3] hover:text-[#F0F2F5] transition-colors cursor-pointer"
+                      title={showMasterKeySecret ? 'Sembunyikan Kunci' : 'Tampilkan Kunci'}
+                    >
+                      {showMasterKeySecret ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
                   </div>
-                  <div className="text-[11px] text-[#A3E0C1] bg-[#16291E] px-2.5 py-1 rounded-md border border-[#264432]">
+                  <div className="text-[11px] text-[#A3E0C1] bg-[#16291E] px-2.5 py-1 rounded-md border border-[#264432] self-start sm:self-auto">
                     ✓ Kunci Aktif Tersimpan di Perangkat Ini
                   </div>
                 </div>
@@ -1459,10 +1677,16 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
                     <strong className="text-[#D1D5DB]">Perlindungan Anti Brute-Force:</strong> Jika seseorang mencoba menebak PIN atau Kunci Rahasia secara berulang-ulang, sistem akan langsung <strong>membekukan akses selama 60 detik</strong> setelah 5 kali salah.
                   </li>
                   <li>
-                    <strong className="text-[#D1D5DB]">Isolasi Sandbox Browser:</strong> Database lokal website ini berjalan pada Sandbox Storage browser perangkat Anda. Pengunjung lain yang membuka web ini dari ponsel mereka memiliki ruang penyimpanan terpisah dan sama sekali tidak bisa mengubah data di HP Anda.
+                    <strong className="text-[#D1D5DB]">Isolasi Sandbox Browser:</strong> Data menu dan PIN berjalan di Sandbox Storage browser perangkat Anda. Pengunjung lain yang membuka web ini dari ponsel mereka memiliki ruang penyimpanan terpisah dan sama sekali tidak bisa mengubah data asli di HP Anda ataupun merusak menu kedai.
                   </li>
                   <li>
-                    <strong className="text-[#D1D5DB]">Auto-Lock Seketika:</strong> Sesi admin otomatis terkunci begitu panel ditutup, jendela browser direfresh, atau tombol Tutup ditekan.
+                    <strong className="text-[#D1D5DB]">Aktivasi Khusus Perangkat Baru:</strong> Di perangkat baru yang belum pernah diaktivasi, sistem tidak lagi menerima sembarang PIN. Diperlukan Kunci Rahasia Pemilik dan Nomor WhatsApp resmi untuk mengaktifkan izin kelola.
+                  </li>
+                  <li>
+                    <strong className="text-[#D1D5DB]">Sinkronisasi Cloud Terpusat (Opsional):</strong> Jika Anda menghendaki 1 kali edit menu di HP Anda otomatis terupdate secara langsung ke SELURUH HP pengunjung di mana pun, sistem dapat dihubungkan ke Cloud Database (Firebase Firestore) menggunakan login akun Google resmi pemilik.
+                  </li>
+                  <li>
+                    <strong className="text-[#D1D5DB]">Auto-Lock Seketika:</strong> Sesi admin otomatis terkunci begitu panel ditutup, jendela browser direfresh, atau tombol Kunci Sesi ditekan.
                   </li>
                   <li>
                     <strong className="text-[#D1D5DB]">Kemudahan Navigasi Kembali:</strong> Anda dan pengunjung kapan saja dapat menutup panel dan kembali ke beranda toko dengan tombol "Tutup", mengeklik area gelap luar, atau menekan tombol Escape (ESC) pada keyboard.
