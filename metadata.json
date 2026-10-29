@@ -1,0 +1,6 @@
+{
+  "name": "Kopi Sukajadi Ciamis - Menu & Order WhatsApp",
+  "description": "Website coffee shop modern dan profesional di Sukajadi, Ciamis, Jawa Barat. Eksplorasi menu minuman kopi, non-kopi, makanan, dan pemesanan praktis via WhatsApp.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
