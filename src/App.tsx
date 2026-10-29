@@ -29,7 +29,8 @@ export default function App() {
         if (
           !parsed.landmark ||
           !parsed.address.includes('NJR Cell') ||
-          parsed.googleMapsUrl !== INITIAL_BUSINESS_INFO.googleMapsUrl
+          parsed.googleMapsUrl !== INITIAL_BUSINESS_INFO.googleMapsUrl ||
+          !parsed.logoUrl
         ) {
           const updated = {
             ...parsed,
@@ -42,11 +43,15 @@ export default function App() {
             bankName: parsed.bankName || INITIAL_BUSINESS_INFO.bankName,
             bankAccountNumber: parsed.bankAccountNumber || INITIAL_BUSINESS_INFO.bankAccountNumber,
             bankAccountName: parsed.bankAccountName || INITIAL_BUSINESS_INFO.bankAccountName,
+            logoUrl: INITIAL_BUSINESS_INFO.logoUrl,
           };
           localStorage.setItem(STORAGE_KEYS.BIZ, JSON.stringify(updated));
           return updated;
         }
-        return parsed;
+        return {
+          ...parsed,
+          logoUrl: parsed.logoUrl || INITIAL_BUSINESS_INFO.logoUrl,
+        };
       }
       return INITIAL_BUSINESS_INFO;
     } catch {
@@ -54,11 +59,28 @@ export default function App() {
     }
   });
 
-  // Menu items with localStorage persistence
+  // Menu items with localStorage persistence & auto-migration for authentic photos
   const [menuItems, setMenuItems] = useState<MenuItem[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.MENU);
-      return saved ? JSON.parse(saved) : INITIAL_MENU_ITEMS;
+      if (saved) {
+        const parsed: MenuItem[] = JSON.parse(saved);
+        // Ensure all default items receive their authentic photos even if cached previously
+        let hasChanges = false;
+        const updated = parsed.map((item) => {
+          const defaultItem = INITIAL_MENU_ITEMS.find((init) => init.id === item.id);
+          if (defaultItem?.imageUrl && (!item.imageUrl || item.imageUrl !== defaultItem.imageUrl)) {
+            hasChanges = true;
+            return { ...item, imageUrl: defaultItem.imageUrl };
+          }
+          return item;
+        });
+        if (hasChanges) {
+          localStorage.setItem(STORAGE_KEYS.MENU, JSON.stringify(updated));
+        }
+        return updated;
+      }
+      return INITIAL_MENU_ITEMS;
     } catch {
       return INITIAL_MENU_ITEMS;
     }

@@ -20,6 +20,7 @@ export const INITIAL_BUSINESS_INFO: BusinessInfo = {
   bankAccountName: 'Kopi Sukajadi / Pengelola',
   qrisNmid: 'ID102026884920',
   qrisNote: 'Bisa scan dari GoPay, OVO, Dana, ShopeePay, BCA, BRImo, Livin Mandiri',
+  logoUrl: '/assets/aistudio/Logo_Kopi_NYT_Elegan_Premium_601e053d.png',
 };
 
 export const INITIAL_MENU_ITEMS: MenuItem[] = [
@@ -34,6 +35,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isFavorite: false,
     badge: 'Classic',
     imageType: 'espresso',
+    imageUrl: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'esp-2',
@@ -44,6 +46,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'espresso',
+    imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'esp-3',
@@ -55,6 +58,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isFavorite: true,
     badge: 'Favorit',
     imageType: 'latte',
+    imageUrl: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'esp-4',
@@ -65,6 +69,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'latte',
+    imageUrl: 'https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'esp-5',
@@ -75,6 +80,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'latte',
+    imageUrl: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?auto=format&fit=crop&w=800&q=80',
   },
 
   // 2. Kopi Susu
@@ -88,6 +94,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isFavorite: true,
     badge: 'Signature',
     imageType: 'kopi-susu',
+    imageUrl: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'kps-2',
@@ -99,6 +106,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isFavorite: false,
     badge: 'Harum Alami',
     imageType: 'kopi-susu',
+    imageUrl: 'https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'kps-3',
@@ -109,6 +117,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'kopi-susu',
+    imageUrl: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'kps-4',
@@ -119,6 +128,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'kopi-susu',
+    imageUrl: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=800&q=80',
   },
 
   // 3. Manual Brew
@@ -132,6 +142,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isFavorite: true,
     badge: 'Barista Choice',
     imageType: 'manual-brew',
+    imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'mb-2',
@@ -142,6 +153,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'manual-brew',
+    imageUrl: 'https://images.unsplash.com/photo-1521302080334-4bebac2763a6?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'mb-3',
@@ -152,6 +164,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'manual-brew',
+    imageUrl: 'https://images.unsplash.com/photo-1518832553480-cd0e625ed3e6?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'mb-4',
@@ -162,6 +175,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'espresso',
+    imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80',
   },
 
   // 4. Non-Coffee
@@ -175,6 +189,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isFavorite: true,
     badge: 'Best Seller',
     imageType: 'matcha',
+    imageUrl: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'nc-2',
@@ -185,6 +200,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'chocolate',
+    imageUrl: 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'nc-3',
@@ -195,6 +211,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'latte',
+    imageUrl: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'nc-4',
@@ -205,6 +222,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'latte',
+    imageUrl: 'https://images.unsplash.com/photo-1579954115545-a95591f28bfc?auto=format&fit=crop&w=800&q=80',
   },
 
   // 5. Minuman Dingin
@@ -218,6 +236,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isFavorite: true,
     badge: 'Segar Maksimal',
     imageType: 'mocktail',
+    imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'md-2',
@@ -228,6 +247,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'iced-tea',
+    imageUrl: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'md-3',
@@ -238,6 +258,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'mocktail',
+    imageUrl: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'md-4',
@@ -248,6 +269,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'mocktail',
+    imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=800&q=80',
   },
 
   // 6. Makanan dan Camilan
@@ -261,6 +283,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isFavorite: true,
     badge: 'Freshly Baked',
     imageType: 'pastry',
+    imageUrl: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'mkn-2',
@@ -271,6 +294,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'toast',
+    imageUrl: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'mkn-3',
@@ -282,6 +306,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isFavorite: true,
     badge: 'Khas Sunda',
     imageType: 'snack',
+    imageUrl: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'mkn-4',
@@ -292,6 +317,7 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     isFavorite: false,
     imageType: 'snack',
+    imageUrl: 'https://images.unsplash.com/photo-1576107232684-1279f3908594?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'mkn-5',
@@ -302,5 +328,6 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     isAvailable: false, // Ditandai habis sebagai contoh status 'Habis'
     isFavorite: false,
     imageType: 'snack',
+    imageUrl: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=800&q=80',
   },
 ];

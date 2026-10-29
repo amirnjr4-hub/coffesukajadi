@@ -20,19 +20,28 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-40 bg-[#0F1113]/90 backdrop-blur-md border-b border-[#262B33] transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-8">
         
-        {/* Zone 1: Wordmark / Brand Title */}
+        {/* Zone 1: Wordmark / Brand Title & Logo */}
         <a
           href="#beranda"
-          className="flex items-center gap-2.5 text-[#F0F2F5] group whitespace-nowrap shrink-0"
+          className="flex items-center gap-3 text-[#F0F2F5] group whitespace-nowrap shrink-0"
         >
-          <div className="w-10 h-10 rounded-xl bg-[#1A1D22] text-[#F0F2F5] border border-[#D49B58]/30 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
-            <Coffee className="w-5 h-5 text-[#D49B58]" />
+          <div className="w-11 h-11 rounded-xl bg-[#14171A] text-[#F0F2F5] border border-[#D49B58]/40 p-1 flex items-center justify-center shadow-md transition-transform group-hover:scale-105 overflow-hidden">
+            <img
+              src={businessInfo.logoUrl || '/assets/aistudio/Logo_Kopi_NYT_Elegan_Premium_601e053d.png'}
+              alt={`${businessInfo.shopName} Logo`}
+              className="w-full h-full object-contain"
+            />
           </div>
           <div>
-            <span className="text-lg font-serif font-bold text-[#F0F2F5] tracking-tight block leading-tight">
-              {businessInfo.shopName}
-            </span>
-            <span className="text-[11px] font-sans text-[#8C95A3] tracking-wide block leading-none">
+            <div className="flex items-center gap-1.5">
+              <span className="text-lg font-serif font-bold text-[#F0F2F5] tracking-tight block leading-tight">
+                {businessInfo.shopName}
+              </span>
+              <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[#D49B58]/20 text-[#D49B58] border border-[#D49B58]/30">
+                NYT
+              </span>
+            </div>
+            <span className="text-[11px] font-sans text-[#8C95A3] tracking-wide block leading-none mt-0.5">
               Sukajadi · Ciamis
             </span>
           </div>

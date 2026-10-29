@@ -102,58 +102,19 @@ export const Hero: React.FC<HeroProps> = ({
               {/* Atmospheric Background Composition with Espresso Slate Gradients */}
               <div className="absolute inset-0 bg-gradient-to-br from-[#1A1D22] via-[#14171A] to-[#0F1113]" />
               
-              {/* Artistic Coffee Illustration */}
-              <div className="absolute inset-0 flex items-center justify-center p-6">
-                <svg
-                  className="w-full h-full max-h-56 opacity-85 drop-shadow-2xl"
-                  viewBox="0 0 400 300"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  {/* Travertine / Slate Counter */}
-                  <rect x="20" y="220" width="360" height="60" rx="6" fill="#1A1D22" />
-                  <rect x="20" y="220" width="360" height="8" fill="#2C323B" />
-
-                  {/* Espresso Machine Silhouette with Amber Crema Accents */}
-                  <rect x="50" y="100" width="130" height="120" rx="8" fill="#0F1113" stroke="#2C323B" strokeWidth="2" />
-                  <rect x="65" y="115" width="100" height="30" rx="4" fill="#1A1D22" />
-                  {/* Machine Pressure Gauges */}
-                  <circle cx="85" cy="130" r="8" fill="#D49B58" stroke="#1A1D22" strokeWidth="1" />
-                  <circle cx="115" cy="130" r="8" fill="#D49B58" stroke="#1A1D22" strokeWidth="1" />
-                  <circle cx="145" cy="130" r="8" fill="#D49B58" stroke="#1A1D22" strokeWidth="1" />
-                  {/* Portafilter */}
-                  <rect x="80" y="150" width="22" height="18" rx="2" fill="#D49B58" />
-                  <path d="M102 158H122" stroke="#F0F2F5" strokeWidth="3" strokeLinecap="round" />
-                  <path d="M91 168V185" stroke="#9DA7B3" strokeWidth="2" strokeLinecap="round" />
-
-                  {/* Ceramic Latte Cup on counter */}
-                  <ellipse cx="230" cy="225" rx="34" ry="6" fill="#0A0C0E" />
-                  <path d="M210 185C210 205 218 218 230 218C242 218 250 205 250 185H210Z" fill="#F0F2F5" />
-                  <path d="M248 190C255 190 260 194 260 200C260 206 254 210 246 210" stroke="#F0F2F5" strokeWidth="2.5" strokeLinecap="round" />
-                  <ellipse cx="230" cy="185" rx="20" ry="6" fill="#362214" />
-                  <ellipse cx="230" cy="184" rx="12" ry="3.5" fill="#D49B58" />
-
-                  {/* Glass Cold Brew / Kopi Susu Aren */}
-                  <path d="M285 160L290 220C290.5 224 294 227 298 227H318C322 227 325.5 224 326 220L331 160H285Z" fill="rgba(255,255,255,0.08)" stroke="#8C95A3" strokeWidth="1.5" />
-                  {/* Brown Sugar Base */}
-                  <path d="M291 216L290 220C290.5 223 293.5 225 297.5 225H318.5C322.5 225 325.5 223 325.8 220L325 216C320 217 300 217 291 216Z" fill="#3D1C06" />
-                  {/* Milk & Coffee layer */}
-                  <path d="M288 185L291 216C300 217 320 217 325 216L328 185H288Z" fill="#E8DEC9" fillOpacity="0.8" />
-                  <path d="M286 166L288 185H328L330 166H286Z" fill="#382417" />
-                  {/* Ice cubes in glass */}
-                  <rect x="296" y="174" width="10" height="10" rx="2" fill="white" fillOpacity="0.35" />
-                  <rect x="310" y="180" width="9" height="9" rx="2" fill="white" fillOpacity="0.25" />
-
-                  {/* Rising steam waves */}
-                  <path d="M224 172C220 160 228 152 224 140" stroke="#D49B58" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
-                  <path d="M236 170C232 158 240 150 236 138" stroke="#D49B58" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
-
-                  {/* Warm hanging lamp lights */}
-                  <line x1="120" y1="0" x2="120" y2="60" stroke="#3A404D" strokeWidth="1.5" />
-                  <circle cx="120" cy="65" r="8" fill="#D49B58" fillOpacity="0.85" />
-                  <line x1="280" y1="0" x2="280" y2="45" stroke="#3A404D" strokeWidth="1.5" />
-                  <circle cx="280" cy="50" r="8" fill="#D49B58" fillOpacity="0.85" />
-                </svg>
+              {/* Premium Brand Logo Showcase */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 pb-16 text-center">
+                <div className="relative max-w-[280px] sm:max-w-[320px] p-4 rounded-2xl bg-[#0F1113]/70 border border-[#D49B58]/30 shadow-2xl backdrop-blur-xs flex items-center justify-center transition-transform hover:scale-105 duration-300">
+                  <img
+                    src={businessInfo.logoUrl || '/assets/aistudio/Logo_Kopi_NYT_Elegan_Premium_601e053d.png'}
+                    alt="Logo Resmi NYT Coffee Shop"
+                    className="w-full max-h-48 object-contain drop-shadow-2xl"
+                  />
+                </div>
+                <div className="mt-2.5 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1A1D22]/90 border border-[#262B33] text-[11px] text-[#D49B58]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#D49B58] animate-pulse" />
+                  <span className="font-medium tracking-wide">Logo Resmi NYT Coffee Shop Sukajadi</span>
+                </div>
               </div>
 
               {/* Foreground card overlay */}

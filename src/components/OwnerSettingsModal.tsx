@@ -375,8 +375,12 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
             <X className="w-5 h-5" />
           </button>
 
-          <div className="w-12 h-12 rounded-2xl bg-[#1A1D22] text-[#D49B58] border border-[#2C323B] flex items-center justify-center mx-auto shadow-md">
-            <Lock className="w-6 h-6 text-[#D49B58]" />
+          <div className="w-16 h-16 rounded-2xl bg-[#14171A] text-[#D49B58] border border-[#D49B58]/40 p-1.5 flex items-center justify-center mx-auto shadow-md overflow-hidden">
+            <img
+              src={businessInfo.logoUrl || '/assets/aistudio/Logo_Kopi_NYT_Elegan_Premium_601e053d.png'}
+              alt={`${businessInfo.shopName} Logo`}
+              className="w-full h-full object-contain"
+            />
           </div>
 
           <div>
@@ -616,8 +620,12 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
         {/* Modal Header with Secure Logout Button */}
         <div className="px-6 py-4 bg-[#16191D] border-b border-[#262B33] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[#1A1D22] text-white flex items-center justify-center border border-[#D49B58]/30">
-              <SlidersHorizontal className="w-5 h-5 text-[#D49B58]" />
+            <div className="w-10 h-10 rounded-xl bg-[#14171A] text-white flex items-center justify-center border border-[#D49B58]/40 p-1 overflow-hidden shrink-0 shadow-xs">
+              <img
+                src={businessInfo.logoUrl || '/assets/aistudio/Logo_Kopi_NYT_Elegan_Premium_601e053d.png'}
+                alt="Logo Kedai"
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
               <h2 className="font-serif font-bold text-lg text-[#F0F2F5]">
@@ -745,6 +753,32 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
                     />
                     <span>Tandai Masih Mode Demonstrasi</span>
                   </label>
+                </div>
+              </div>
+
+              {/* Logo Kedai Preview & Edit */}
+              <div className="p-3.5 bg-[#16191D] rounded-xl border border-[#262B33] flex flex-col sm:flex-row items-center gap-4">
+                <div className="w-16 h-16 rounded-xl bg-[#121417] border border-[#D49B58]/40 p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-inner">
+                  <img
+                    src={formData.logoUrl || '/assets/aistudio/Logo_Kopi_NYT_Elegan_Premium_601e053d.png'}
+                    alt="Logo Kedai Preview"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="flex-1 w-full space-y-1">
+                  <label className="block text-xs font-semibold text-[#F0F2F5]">
+                    URL / Path File Logo Kedai
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.logoUrl || ''}
+                    onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
+                    placeholder="/assets/aistudio/Logo_Kopi_NYT_Elegan_Premium_601e053d.png"
+                    className="w-full px-3 py-1.5 bg-[#1A1D22] text-[#F0F2F5] rounded-lg text-xs border border-[#2C323B] font-mono focus:ring-2 focus:ring-[#D49B58] focus:outline-hidden"
+                  />
+                  <span className="text-[10px] text-[#8C95A3] block">
+                    File logo aktif: Logo Resmi NYT Coffee Shop Elegan
+                  </span>
                 </div>
               </div>
 
@@ -978,23 +1012,43 @@ export const OwnerSettingsModal: React.FC<OwnerSettingsModalProps> = ({
               <div className="divide-y divide-[#262B33] bg-[#1A1D22] rounded-xl border border-[#262B33] overflow-hidden">
                 {menuItems.map((item) => (
                   <div key={item.id} className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] uppercase font-mono tracking-wider text-[#D49B58] bg-[#16191D] px-1.5 py-0.5 rounded border border-[#2C323B]">
-                          {item.category}
-                        </span>
-                        {item.badge && (
-                          <span className="text-[10px] text-[#A3E0C1] font-semibold">
-                            {item.badge}
-                          </span>
+                    <div className="flex items-center gap-3.5 flex-1 min-w-0">
+                      {/* Photo Thumbnail */}
+                      <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-[#121417] border border-[#262B33] shadow-xs">
+                        {item.imageUrl ? (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-[9px] text-[#8C95A3] font-mono">
+                            Grafis
+                          </div>
                         )}
                       </div>
-                      <h4 className="font-serif font-bold text-sm text-[#F0F2F5] mt-0.5">
-                        {item.name}
-                      </h4>
-                      <p className="text-xs text-[#8C95A3] line-clamp-1">
-                        {item.description}
-                      </p>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] uppercase font-mono tracking-wider text-[#D49B58] bg-[#16191D] px-1.5 py-0.5 rounded border border-[#2C323B]">
+                            {item.category}
+                          </span>
+                          {item.badge && (
+                            <span className="text-[10px] text-[#A3E0C1] font-semibold">
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="font-serif font-bold text-sm text-[#F0F2F5] mt-0.5">
+                          {item.name}
+                        </h4>
+                        <p className="text-xs text-[#8C95A3] line-clamp-1">
+                          {item.description}
+                        </p>
+                      </div>
                     </div>
 
                     {/* Price and Availability Controls */}

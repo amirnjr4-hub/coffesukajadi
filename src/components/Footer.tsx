@@ -22,13 +22,22 @@ export const Footer: React.FC<FooterProps> = ({ businessInfo, onOpenSettings }) 
           
           {/* Col 1: Brand & Slogan */}
           <div className="md:col-span-5 space-y-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#1A1D22] text-[#D49B58] border border-[#D49B58]/30 flex items-center justify-center shadow-xs">
-                <Coffee className="w-5 h-5 text-[#D49B58]" />
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-[#14171A] text-[#D49B58] border border-[#D49B58]/40 p-1 flex items-center justify-center shadow-md overflow-hidden shrink-0">
+                <img
+                  src={businessInfo.logoUrl || '/assets/aistudio/Logo_Kopi_NYT_Elegan_Premium_601e053d.png'}
+                  alt={`${businessInfo.shopName} Logo`}
+                  className="w-full h-full object-contain"
+                />
               </div>
-              <span className="text-xl font-serif font-bold text-[#F0F2F5] tracking-tight">
-                {businessInfo.shopName}
-              </span>
+              <div>
+                <span className="text-xl font-serif font-bold text-[#F0F2F5] tracking-tight block">
+                  {businessInfo.shopName}
+                </span>
+                <span className="text-[11px] text-[#D49B58] tracking-widest uppercase font-semibold">
+                  NYT Coffee Shop · Sukajadi
+                </span>
+              </div>
             </div>
             
             <p className="text-xs sm:text-sm text-[#8C95A3] max-w-sm leading-relaxed font-light">

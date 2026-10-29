@@ -9,18 +9,39 @@ interface ProductVisualProps {
 
 export const ProductVisual: React.FC<ProductVisualProps> = ({ item, className = '', size = 'md' }) => {
   const [imageError, setImageError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   if (item.imageUrl && !imageError) {
     return (
-      <div className={`relative overflow-hidden bg-[#241711] ${className}`}>
+      <div className={`relative overflow-hidden bg-[#16191D] ${className}`}>
+        {/* Placeholder skeleton while loading */}
+        {!isLoaded && (
+          <div className="absolute inset-0 bg-[#1A1D22] animate-pulse flex items-center justify-center">
+            <span className="text-[10px] font-mono text-[#D49B58]/60 uppercase tracking-widest">
+              Foto Asli Menu...
+            </span>
+          </div>
+        )}
+
         <img
           src={item.imageUrl}
           alt={item.name}
+          loading="lazy"
           referrerPolicy="no-referrer"
+          onLoad={() => setIsLoaded(true)}
           onError={() => setImageError(true)}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-108 ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+
+        {/* Ambient moody vignette & contrast gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0F1113]/85 via-[#0F1113]/20 to-transparent pointer-events-none" />
+
+        {/* Authentic category label badge */}
+        <div className="absolute bottom-2.5 left-3 z-10 text-[10px] uppercase tracking-wider font-mono text-[#E2E8F0] bg-[#0F1113]/80 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/10 pointer-events-none">
+          {item.category}
+        </div>
       </div>
     );
   }

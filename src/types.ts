@@ -48,4 +48,5 @@ export interface BusinessInfo {
   bankAccountName?: string;
   qrisNmid?: string;
   qrisNote?: string;
+  logoUrl?: string;
 }
